@@ -18,7 +18,7 @@ class die:
         
         '''
         purpose: create instance of class die
-        param: <list> of faces on die
+        param: <array> of faces on die
         return: None
         '''
         
@@ -28,6 +28,7 @@ class die:
         self.weights = weights
         self.__fwdf__ = pd.DataFrame(self.weights, index=self.faces)
         self.__fwdf__.columns = ['Weight']
+        self.__fwdf__.index.name = 'Faces'
         
     def change_weight(self, face, weight):
         
@@ -44,6 +45,7 @@ class die:
                 self.weights[i] = float(weight)
                 self.__fwdf__ = pd.DataFrame(self.weights, index=self.faces)
                 self.__fwdf__.columns = ['Weight']
+                self.__fwdf__.index.name = 'Faces'
             else:
                 print('Weight must be entered as float or int')
         else: 
@@ -54,7 +56,7 @@ class die:
         '''
         purpose: return a random face of die with condiseration to weights
         param: <int >number of rolls 
-        return: face value
+        return: <list> face values
         '''
         
         return random.choices(self.faces, weights=self.weights, k=rolls)
@@ -136,6 +138,7 @@ class analyzer:
     '''
     
     game = game()
+    game.play()
     
     
     def __init__(self, game=game): 
@@ -146,13 +149,13 @@ class analyzer:
         '''
         self.game = game
         self.data_type = type(game.show_rolls().iloc[1,1])
+        self.jpdf = pd.DataFrame()
                               
     def jackpot(self):
         '''
         purpose: counts the number of rolls in game all dices showed an identical face
         return: <int> number of occurances
         '''
-        self.jpdf = pd.DataFrame()
         df = self.game.show_rolls(True)
         rolls_lst = []
         count = 1
@@ -165,7 +168,7 @@ class analyzer:
         self.jpdf = self.jpdf.T
         return len(self.jpdf)
     
-    def sequences(self):
+    def sequence(self, freq=False):
         
         '''
         purpose: method to compute the number of distinct sequences of faces rolled
@@ -174,51 +177,85 @@ class analyzer:
         
         df = self.game.show_rolls(True) 
         rolls_lst = []
-        str_lst = []
         
         # Get a list of list of values
         for i in range(len(df)):   
             rolls_lst.append(list(df.iloc[i,:]))
         
-        for x in rolls_lst:
-            string = ''
-            for i in x:
-                string += str(i)
-            str_lst.append(string)
+        # Frequency sorted dataframe    
+        if freq == True:
+            rolls_dict = {}
+            count = 1
+            for roll in rolls_lst:
+                roll = ''.join([str(i) for i in roll])
+                if roll in rolls_dict:
+                    rolls_dict[roll][0].append(count)
+                    rolls_dict[roll][1] += 1
+                if roll not in rolls_dict:
+                    rolls_dict[roll] = [[count], 1]
+                count += 1
+
+            freq_sdf = pd.DataFrame(rolls_dict).T
+            freq_sdf.columns = ['Roll #s', 'Total Frequency']
+            freq_sdf.index.name = 'Sequences'
+            freq_sdf = freq_sdf.sort_values(by = ['Total Frequency'], ascending = False)
+            self.freq_sdf = freq_sdf 
+            return self.freq_sdf
         
-        return len(np.unique(str_lst))
-    
-    def combo(self):
+        # Sequence sorted dataframe
+        if freq == False: 
+            sdf = pd.DataFrame(df.value_counts())
+            sdf.columns=['Frequency']
+            sdf.index.name = 'Face Values'
+            self.sdf = sdf
+            return sdf
+        
+    def combo(self, freq = False):
         
         '''
-        purpose: method to compute the number distinct combinations of faces rolled
-        return: <int> number of unique combinations
+        purpose: method to compute a dataframe of distinct combinations of faces rolled
+        return: <df> of combinations and their frequency
         ''' 
         
         df = self.game.show_rolls(True) 
         rolls_lst = []
-        counts_lst = []
-        unique_vals = []
         
         # Get a list of list of values
         for i in range(len(df)):   
             rolls_lst.append(list(df.iloc[i,:]))
-    
-        # Get a list of all unique values
-        for x in rolls_lst:
-            for i in x:
-                if i not in unique_vals:
-                    unique_vals.append(i)
-        unique_vals.sort()
         
-        #Iterate through each roll and count how many of each unique val, make a list of unique combos
-        for x in rolls_lst: 
-            count = [0 for i in unique_vals]
-            for i in x:
-                count[unique_vals.index(i)] += 1
-            if count not in counts_lst: 
-                counts_lst.append(count)
-        return len(counts_lst)
+        # frequency sorted dataframe
+        if freq ==True:
+            rolls_dict = {}
+            count = 1
+            for roll in rolls_lst:
+                roll = ''.join([str(i) for i in sorted(roll)])
+                if roll in rolls_dict:
+                    rolls_dict[roll][0].append(count)
+                    rolls_dict[roll][1] += 1
+                if roll not in rolls_dict:
+                    rolls_dict[roll] = [[count], 1]
+                count += 1
+        
+            freq_cdf = pd.DataFrame(rolls_dict).T
+            freq_cdf.columns = ['Roll #s', 'Total Frequency']
+            freq_cdf.index.name = 'Combination'
+            freq_cdf = freq_cdf.sort_values(by = ['Total Frequency'], ascending = False)
+            self.freq_cdf = freq_cdf
+            return self.freq_cdf
+        
+        # combo-sorted dataframe 
+        if freq == False: 
+            dct = {}
+            for i in range(len(rolls_lst)):
+                dct[i+1] = sorted(rolls_lst[i])
+            dfsorted = pd.DataFrame(dct).T
+            cdf = pd.DataFrame(dfsorted.value_counts())
+            cdf.columns=['Frequency']
+            cdf.index.name = 'Face Values'
+            self.cdf = cdf
+            return cdf
+            
         
     def counts(self):
         
@@ -255,164 +292,5 @@ class analyzer:
         # make dataframe
         countsdf = pd.DataFrame(counts_dct).T
         countsdf.columns = unique_vals
-        return countsdf
-
-class analyzer:
-    '''
-    takes the results of a single game and computes various descriptive statistical properties about it
-    '''
-    
-    game = game()
-    
-    
-    def __init__(self, game=game): 
-        '''
-        purpose: create and instance of analyzer class
-        param: instance of class game
-        return: None
-        '''
-        self.game = game
-        self.data_type = type(game.show_rolls().iloc[1,1])
-        self.jpdf = pd.DataFrame()
-                              
-    def jackpot(self):
-        '''
-        purpose: counts the number of rolls in game all dices showed an identical face
-        return: <int> number of occurances
-        '''
-        df = self.game.show_rolls(True)
-        rolls_lst = []
-        count = 1
-        for i in range(len(df)):
-            rolls_lst.append(list(df.iloc[i,:]))
-        for roll in rolls_lst:
-            if len(set(roll))==1:
-                self.jpdf[count]=roll
-            count += 1
-        self.jpdf = self.jpdf.T
-        return len(self.jpdf)
-    
-    def sequences(self):
-        
-        '''
-        purpose: method to compute the number of distinct sequences of faces rolled
-        return: <int> number of unique sequences
-        '''
-        
-        df = self.game.show_rolls(True) 
-        rolls_lst = []
-        str_lst = []
-        
-        # Get a list of list of values
-        for i in range(len(df)):   
-            rolls_lst.append(list(df.iloc[i,:]))
-        
-        for x in rolls_lst:
-            string = ''
-            for i in x:
-                string += str(i)
-            str_lst.append(string)
-        
-        return len(np.unique(str_lst))
-    
-    def combo(self):
-        
-        '''
-        purpose: method to compute the number distinct combinations of faces rolled
-        return: <int> number of unique combinations
-        ''' 
-        
-        df = self.game.show_rolls(True) 
-        rolls_lst = []
-        counts_lst = []
-        unique_vals = []
-        
-        # Get a list of list of values
-        for i in range(len(df)):   
-            rolls_lst.append(list(df.iloc[i,:]))
-    
-        # Get a list of all unique values
-        for x in rolls_lst:
-            for i in x:
-                if i not in unique_vals:
-                    unique_vals.append(i)
-        unique_vals.sort()
-        
-        #Iterate through each roll and count how many of each unique val, make a list of unique combos
-        for x in rolls_lst: 
-            count = [0 for i in unique_vals]
-            for i in x:
-                count[unique_vals.index(i)] += 1
-            if count not in counts_lst: 
-                counts_lst.append(count)
-        return len(counts_lst)
-        
-    def counts(self):
-        
-        '''
-        purpose: method to compute how many times a given face is rolled in each event
-        return: dataframe
-        '''
-        
-        df = self.game.show_rolls(True) 
-        rolls_lst = []
-        counts_dct = {}
-        unique_vals = []
-        
-        # Get a list of list of values
-        for i in range(len(df)):   
-            rolls_lst.append(list(df.iloc[i,:]))
-    
-        # Get a list of all unique values
-        for x in rolls_lst:
-            for i in x:
-                if i not in unique_vals:
-                    unique_vals.append(i)
-        unique_vals.sort()
-        
-        #Iterate through each roll and count how many of each unique val, make a dict of combos
-        y = 1
-        for x in rolls_lst: 
-            count = [0 for i in unique_vals]
-            for i in x:
-                count[unique_vals.index(i)] += 1
-            counts_dct[y] = count
-            y += 1
-            
-        # make dataframe
-        countsdf = pd.DataFrame(counts_dct).T
-        countsdf.columns = unique_vals
-        return countsdf
-
-    def most_frequent(self, n):
-        
-        df = self.game.show_rolls(True) 
-        rolls_lst = []
-        counts_dict = {}
-        unique_vals = []
-        
-        # Get a list of list of values
-        for i in range(len(df)):   
-            rolls_lst.append(list(df.iloc[i,:]))
-    
-        # Get a list of all unique values
-        for x in rolls_lst:
-            for i in x:
-                if i not in unique_vals:
-                    unique_vals.append(i)
-        unique_vals.sort()
-        
-        #Iterate through each roll and count how many of each unique val, make a list of unique combos
-        for x in rolls_lst: 
-            count = [0 for i in unique_vals]
-            for i in x:
-                count[unique_vals.index(i)] += 1
-            count = ''.join([str(i) for i in count])
-            if count not in list(counts_dict.keys()): 
-                counts_dict[count]=0
-            if count in list(counts_dict.keys()):
-                counts_dict[count]+=1
-        counts_df = pd.DataFrame.from_dict(counts_dict, orient='index')
-        counts_df.columns = ['F']
-        return counts_df.sort_values(by = ['F'], ascending = False).head(n)
-    
+        self.countsdf = countsdf
+        return self.countsdf
