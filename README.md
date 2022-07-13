@@ -3,7 +3,9 @@
 METADATA:
 
 Montecarlo package
+
 Author: Kate Meldrum
+
 Author email: kmm4ap@virginia.edu
 
 MANIFEST:
