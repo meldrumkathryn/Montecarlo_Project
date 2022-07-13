@@ -33,23 +33,23 @@ from monte.montecarlo import *
 
 2) Creating a Die:
 
-to create a die pass in a list of faces to the die class, the die will be generated with 
+To create a die, pass in a list of faces you would like your die to have to the die class, faces can be int, float, bool, or string class, and the die can have any number of faces:
 
 die_object = die([1,2,3,4,5,6])
 
 docstring: 
         purpose: create instance of class die
-        param: <array> of faces on die
+        param: <list> of faces on die
         return: None
 
 atributes:
-        die.faces = [1,2,3,4,5,6]
-        die.weights = [1,1,1,1,1,1] 
+        die_object.faces = a list of faces belonging to the die object 
+        die_object.weights = a list of weights corresponding to die object faces
 
 
 3) Change die weight:
 
-use the change_weight function which takes two arguments; the face value to be changed and the weight to change it to, for example to weight of the 1 face of the die we just created to 3 we would use the code: 
+Use the change_weight function which takes two arguments; the face value to be changed and the weight to change it to. For example, to weight the '1' face of the die we just created by a factor of 3 we would use the code: 
 
 die_object.change_weight(1, 3)
     
@@ -59,9 +59,11 @@ docstring:
         param2: <int or float> weight to be given to face 
         return: None
 
+  In practice, weighting a face by a factor of 3 means that die becomes 3 times more likely to be rolled than a face with a weight of 1.     
+        
 4) Roll a die: 
 
-To roll a die we use the roll_die function and pass in the number of times we want a die to be rolled. This will ouput a randomized list of 4 face values:
+To roll a die, we use the roll_die function and pass in the number of times we want a die to be rolled. For example, this code will ouput a randomized list of 4 face values in our die object:
 
 die_object.roll_die(4)
     
@@ -72,7 +74,7 @@ docstring:
 
 5) Display the current faces and weights of a die object:
 
-The current faces and weights of our die object can be shown using the display function:
+The current faces and weights of our die object can be shown using the display function, this returns a dataframe with index of die faces and values of face weights:
 
 die_object.display()
     
@@ -82,9 +84,9 @@ docstring:
 
 6) Creating a game:
 
-To create a game class object simply pass in a list of dice to be involved in the game into the game class, if no dice are passed in the game will default to having 6 standard dice (faces 1-6):
+To create a game class object, simply pass in a list of dice to be involved in the game into the game class. If no dice are passed in the game will default to having 6 standard dice (faces 1-6), but if we wanted to play a game with two of our custom die objects this is what we would use:
 
-game_object = game([die1, die2, die3])
+game_object = game([die_object,die_object])
     
 docstring: 
         purpose: create and isntance of a game
@@ -92,8 +94,8 @@ docstring:
         return: None
 
 atributes:
-        game_object.die1 = die1
-        game_object.die_list = [die1, die2, die3]
+        game_object.die_object = references the die with name die_object within game object, this allows you to (for example) display the properites of the die or change it's weight after the game object is created. 
+        game_object.die_list = the original list of dice passed into the game object 
 
 7) Play a game:
 
@@ -108,7 +110,7 @@ docstring:
 
 8) Show the rolls
 
-After calling the play function, in order to see the results call the show_rolls function, this has an optional boolean argument wide= True or wide= False to produce a wide or narrow dataframe, respectively:
+After calling the play function, in order to see the results, call the show_rolls function. This has an optional boolean argument (wide= True) or (wide= False) to produce a wide or narrow dataframe, respectively:
 
 game_object.show_rolls(wide = True)
     
@@ -140,9 +142,9 @@ attributes:
         
     
 
-If no game object is passed a default analyzer object will be created with a default game (as discribed above) that was played with 100 rolls. 
+**If no game object is passed a default analyzer object will be created with a default game (as discribed above) that was played with 100 rolls. 
 
-Note that if you pass your own game object to analyzer and haven't played a game with that game many of the analyzer functions won't work as they depend on a dataframe of play results. 
+**Note that if you pass your own game object to analyzer and haven't played a game with that game many of the analyzer functions won't work as they depend on a dataframe of play results. 
 
 10) Find jackpots
 
@@ -172,7 +174,8 @@ as the argument suggests, this dataframe is sorted by frequence from greatest to
     
 docstring:
         purpose: method to compute the number of distinct sequences of faces rolled
-        return: <int> number of unique sequences
+        param: freq=True/False to sort by frequency or not, defaults to false
+        return: dataframe
 
 12) Find unique combinations
 
@@ -183,7 +186,8 @@ analyzer_object.combo(freq = True)
 
 docstring:
         purpose: method to compute a dataframe of distinct combinations of faces rolled
-        return: <df> of combinations and their frequency
+        param: freq = True/False to sort by frequency or not, defaults to false
+        return: dataframe
 
 13) Find counts of faces in each roll
 
