@@ -8,8 +8,3 @@ setup(name='monte',
       author_email='kmm4ap@gmail.com',
       license='MIT',
       packages=find_packages())
-
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
