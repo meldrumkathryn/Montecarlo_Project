@@ -49,9 +49,9 @@ class die:
                 self.__fwdf__.columns = ['Weight']
                 self.__fwdf__.index.name = 'Faces'
             else:
-                print('Weight must be entered as float or int')
+                return 'Weight must be entered as float or int'
         else: 
-            print('Face does not exist on this die')
+            return 'Face does not exist on this die'
             
     def roll_die(self, rolls=1):
         

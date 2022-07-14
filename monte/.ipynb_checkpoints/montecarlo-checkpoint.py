@@ -24,6 +24,7 @@ class die:
         
         weights = [1.0 for x in faces] # Create default weights
         
+        #die attributes
         self.faces = faces
         self.weights = weights
         self.__fwdf__ = pd.DataFrame(self.weights, index=self.faces)
@@ -39,6 +40,7 @@ class die:
         return: None
         '''
         
+        # must be existing face and numeric weight
         if face in self.faces: 
             if type(weight)==float or type(weight)==int:
                 i = self.faces.index(face)
@@ -47,9 +49,9 @@ class die:
                 self.__fwdf__.columns = ['Weight']
                 self.__fwdf__.index.name = 'Faces'
             else:
-                print('Weight must be entered as float or int')
+                return 'Weight must be entered as float or int'
         else: 
-            print('Face does not exist on this die')
+            return 'Face does not exist on this die'
             
     def roll_die(self, rolls=1):
         
@@ -59,6 +61,7 @@ class die:
         return: <list> face values
         '''
         
+        # random.choices pulls sample with replacement
         return random.choices(self.faces, weights=self.weights, k=rolls)
     
     def display(self):
@@ -68,6 +71,7 @@ class die:
         return: dataframe
         '''
         
+        # allows users to access private face weight dataframe
         return self.__fwdf__
 
 
@@ -96,6 +100,7 @@ class game:
         return: None
         '''
         
+        #attributes
         for die in die_list:
             self.die=die
         self.die_list=die_list
@@ -109,6 +114,7 @@ class game:
         return: None
         '''
         
+        #for each die, roll a certain amount of times and add to dictionary, create private dataframe when all dice have been rolled
         data = {}
         count=1
         for die in self.die_list:
@@ -124,6 +130,7 @@ class game:
         return: dataframe 
         '''
         
+        # allow user to access private play dataframe
         if wide==True: 
             return self.__playdf__
         if wide == False:
@@ -147,6 +154,8 @@ class analyzer:
         param: instance of class game
         return: None
         '''
+        
+        #attributes
         self.game = game
         self.data_type = type(game.show_rolls().iloc[1,1])
         self.jpdf = pd.DataFrame()
@@ -156,6 +165,8 @@ class analyzer:
         purpose: counts the number of rolls in game all dices showed an identical face
         return: <int> number of occurances
         '''
+        
+        #creates public dataframe, returns length
         df = self.game.show_rolls(True)
         rolls_lst = []
         count = 1
@@ -166,6 +177,7 @@ class analyzer:
                 self.jpdf[count]=roll
             count += 1
         self.jpdf = self.jpdf.T
+        self.jpdf.index.name = 'Roll #'
         return len(self.jpdf)
     
     def sequence(self, freq=False):
@@ -179,11 +191,11 @@ class analyzer:
         df = self.game.show_rolls(True) 
         rolls_lst = []
         
-        # Get a list of list of values
+        # Get a list of list of row values
         for i in range(len(df)):   
             rolls_lst.append(list(df.iloc[i,:]))
         
-        # Frequency sorted dataframe    
+        # Create frequency sorted dataframe    
         if freq == True:
             rolls_dict = {}
             count = 1
@@ -203,7 +215,7 @@ class analyzer:
             self.freq_sdf = freq_sdf 
             return self.freq_sdf
         
-        # Sequence sorted dataframe
+        # Sequence sorted dataframe with multi-index
         if freq == False: 
             sdf = pd.DataFrame(df.value_counts())
             sdf.columns=['Frequency']
@@ -226,7 +238,7 @@ class analyzer:
         for i in range(len(df)):   
             rolls_lst.append(list(df.iloc[i,:]))
         
-        # frequency sorted dataframe
+        # Create frequency sorted dataframe
         if freq ==True:
             rolls_dict = {}
             count = 1
@@ -246,7 +258,7 @@ class analyzer:
             self.freq_cdf = freq_cdf
             return self.freq_cdf
         
-        # combo-sorted dataframe 
+        # combo-sorted dataframe with multi-index
         if freq == False: 
             dct = {}
             for i in range(len(rolls_lst)):
@@ -275,14 +287,14 @@ class analyzer:
         for i in range(len(df)):   
             rolls_lst.append(list(df.iloc[i,:]))
     
-        # Get a list of all unique values
+        # Get a list of all unique values, sort it
         for x in rolls_lst:
             for i in x:
                 if i not in unique_vals:
                     unique_vals.append(i)
         unique_vals.sort()
         
-        #Iterate through each roll and count how many of each unique val, make a dict of combos
+        #Iterate through each roll and count how many of each unique val, make a dict of roll counts
         y = 1
         for x in rolls_lst: 
             count = [0 for i in unique_vals]

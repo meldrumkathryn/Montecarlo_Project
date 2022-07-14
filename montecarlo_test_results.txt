@@ -1,13 +1,27 @@
 (base) Kates-MacBook-Air:DS5100_Final meldrumapple$ python montecarlo_test.py
-test_1_change_weight (__main__.montecarlotest) ... ok
-test_2_roll_die (__main__.montecarlotest) ... ok
-test_3_display (__main__.montecarlotest) ... ok
-test_4_play (__main__.montecarlotest) ... ok
-test_5_show_rolls (__main__.montecarlotest) ... ok
-test_6_jackpot (__main__.montecarlotest) ... ok
-test_7_sequence (__main__.montecarlotest) ... ok
-test_8_combo (__main__.montecarlotest) ... ok
-test_9_counts (__main__.montecarlotest) ... ok
+Welcome to montecarlo
+test_1_change_weight (__main__.montecarlotest)
+purpose: tests change_weight function for if the correct weight was changed to the correct value ... ok
+test_1a_change_weight (__main__.montecarlotest)
+purpose: tests change_weight funciton for if it only accepts ints/floats as the new weight values and only accepts current face as face argument ... ok
+test_2_roll_die (__main__.montecarlotest)
+purpose: tests roll_die function to make sure that faces returned on roll exist and the right number of faces are returned ... ok
+test_3_display (__main__.montecarlotest)
+purpose: tests display function to see if the dataframe produced contains the correct weight values ... ok
+test_4_play (__main__.montecarlotest)
+purpose: tests play function to make sure that it creates a dataframe of the correct length (correct number of rolls are returned) and that the dataframe contains a number of columns equal to number of dice in game ... ok
+test_5_show_rolls (__main__.montecarlotest)
+purpose: tests show_rolls function to make sure that it returns a dataframe of the correct length (correct number of rolls are returned) and that the dataframe contains a number of columns equal to number of dice in game ... ok
+test_6_jackpot (__main__.montecarlotest)
+purpose: tests jackpot function to make sure it returns a the number of jackpots as equal to the length of the created jackpot dataframe ... ok
+test_7_sequence (__main__.montecarlotest)
+purpose: tests sequence function to see if it returns the correctly-dimensioned dataframe for both freqeuncy mode and multiindex mode ... ok
+test_8_combo (__main__.montecarlotest)
+purpose: tests combo function to see if it returns the correctly-dimensioned dataframe for both freqeuncy mode and multiindex mode ... ok
+test_9_counts (__main__.montecarlotest)
+purpose: tests if the counts function returns a dataframe of the correct dimensions ... ok
 
 ----------------------------------------------------------------------
-Ran 9 tests in 0.086s
+Ran 10 tests in 0.137s
+
+OK
