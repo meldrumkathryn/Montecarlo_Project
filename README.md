@@ -44,6 +44,7 @@ docstring:
 
 atributes:
         die_object.faces = a list of faces belonging to the die object 
+        
         die_object.weights = a list of weights corresponding to die object faces
 
 
@@ -54,8 +55,8 @@ Use the change_weight function which takes two arguments; the face value to be c
 die_object.change_weight(1, 3)
     
 docstring:
-        purpose: change weight given to a face of die in roll
-        param1: <string, int, float> face to weight
+        purpose: change weight given to a face of die in roll 
+        param1: <string, int, float> face to weight 
         param2: <int or float> weight to be given to face 
         return: None
 
