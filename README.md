@@ -23,7 +23,7 @@ Author email: kmm4ap@virginia.edu
 
 ## 1) install/import code
 
-install package using 
+install package in terminal using the following code within directory where the package is downloaded: 
 
 ! pip install -e .
 
